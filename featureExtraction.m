@@ -56,10 +56,11 @@ function glcmFeatures = extractGLCMFeatures(processedImage)
     angles = 0;                     % Horizontal direction
 
     % Compute the Gray-Level Co-occurrence Matrix
-    glcm = graycomatrix(grayImg, levels, distances, angles);
+    offsets = [0 1];  % Horizontal right neighbor
+    glcm = graycomatrix(grayImg, 'Offset', offsets, 'NumLevels', levels);
 
     % Initialize texture feature variables
-    contrast = 0;
+    textureContrast = 0;
     homogeneity = 0;
     energy = 0;
 
@@ -67,18 +68,18 @@ function glcmFeatures = extractGLCMFeatures(processedImage)
     for i = 1:levels
         for j = 1:levels
             % Contrast: Measure of the intensity contrast between a pixel and its neighbor
-            contrast += (i - j)^2 * glcm(i, j);
+            textureContrast = textureContrast + (i - j)^2 * glcm(i, j);
 
             % Homogeneity: Measures the closeness of the distribution of elements in GLCM to GLCM diagonal
-            homogeneity += glcm(i, j) / (1 + abs(i - j));
+            homogeneity = homogeneity + glcm(i, j) / (1 + abs(i - j));
 
             % Energy: Sum of squared elements in the GLCM
-            energy += glcm(i, j)^2;
+            energy = energy + glcm(i, j)^2;
         end
     end
 
     disp("Texture Properties:");
-    fprintf('Contrast: %f\n', contrast);
+    fprintf('Texture Contrast: %f\n', contrast);
     fprintf('Homogeneity: %f\n', homogeneity);
     fprintf('Energy: %f\n', energy);
 
